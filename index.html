@@ -97,7 +97,7 @@
             margin-bottom: 40px;
         }
 
-        /* Midnight Section - Optimized */
+        /* Midnight Section */
         .midnight-feature {
             background: linear-gradient(90deg, #122136 0%, #17111F 100%);
             border: 1px solid rgba(157, 80, 187, 0.2);
@@ -140,7 +140,6 @@
         }
         .metric-item p { font-size: 24px; font-weight: 400; color: var(--text-white); }
         .metric-item .sub-text { font-size: 12px; color: var(--accent-gold); }
-        .loading-txt { opacity: 0.6; font-size: 16px; font-style: italic; }
 
         /* Pool ID */
         .pool-id-section {
@@ -236,9 +235,9 @@
 
         <section class="metrics-strip">
             <div class="metric-item">
-                <h4>Live Active Stake</h4>
-                <p id="live-stake-value"><span class="loading-txt">Loading...</span></p>
-                <span class="sub-text" id="live-stake-sub">Connecting...</span>
+                <h4>Uptime</h4>
+                <p>99.9%</p>
+                <span class="sub-text">24/7 Monitoring</span>
             </div>
             <div class="metric-item">
                 <h4>Variable Fee</h4>
@@ -289,9 +288,10 @@
         </div>
     </footer>
 
-<script>
-        // --- 1. Swiss Accordion Logic ---
+    <script>
+        // --- 1. Swiss Accordion Logic (Auto-close others) ---
         const detailsElements = document.querySelectorAll("details");
+        
         detailsElements.forEach((detail) => {
             detail.addEventListener("toggle", () => {
                 if (detail.open) {
@@ -309,6 +309,7 @@
             const poolId = document.getElementById("poolId").innerText;
             navigator.clipboard.writeText(poolId).then(() => {
                 const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerText;
                 btn.innerText = "Copied";
                 btn.style.borderColor = "#27AE60";
                 btn.style.color = "#27AE60";
@@ -319,55 +320,6 @@
                 }, 2000);
             });
         }
-
-        // --- 3. Robust Live Data (Using Widget API) ---
-        async function fetchPoolData() {
-            const stakeValueElem = document.getElementById('live-stake-value');
-            const stakeSubElem = document.getElementById('live-stake-sub');
-            
-            // This is your pool's specific Hex ID for the widget API
-            const poolHexId = "0d633364402634674751790403160e1d13f9829cc164d1f274738596";
-            const widgetUrl = `https://js.adapools.org/pools/${poolHexId}/summary.json`;
-
-            try {
-                const response = await fetch(widgetUrl);
-                if (!response.ok) throw new Error("Widget API failed");
-                
-                const data = await response.json();
-                
-                // Adapools returns stake in whole ADA (String), not Lovelace
-                // Example structure: { data: { total_stake: "1234567.89", ... } }
-                if (data && data.data && data.data.total_stake) {
-                    // Remove commas if present and parse
-                    const cleanStake = parseFloat(data.data.total_stake.replace(/,/g, ''));
-                    updateStakeUI(cleanStake, stakeValueElem, stakeSubElem);
-                } else {
-                    throw new Error("Data format changed");
-                }
-
-            } catch (error) {
-                console.error("Live fetch failed:", error);
-                // Clean Fallback
-                stakeValueElem.innerHTML = '<a href="https://beta.cexplorer.io/pool/pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r" target="_blank" style="font-size:15px; text-decoration:underline; color: var(--accent-gold);">View on Explorer</a>';
-                stakeSubElem.innerText = "Live Verification";
-            }
-        }
-
-        function updateStakeUI(adaAmount, valueElem, subElem) {
-            let formatted;
-            if (adaAmount >= 1000000) {
-                formatted = (adaAmount / 1000000).toFixed(2) + 'M';
-            } else if (adaAmount >= 1000) {
-                formatted = (adaAmount / 1000).toFixed(0) + 'k';
-            } else {
-                formatted = Math.floor(adaAmount).toLocaleString();
-            }
-
-            valueElem.innerHTML = `${formatted} <span style="font-size: 14px;">ADA</span>`;
-            subElem.innerHTML = '<span style="color:#27AE60;">● Live Network Data</span>';
-        }
-
-        window.addEventListener('DOMContentLoaded', fetchPoolData);
     </script>
 </body>
 </html>
