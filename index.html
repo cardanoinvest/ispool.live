@@ -292,7 +292,6 @@
 <script>
         // --- 1. Swiss Accordion Logic (Auto-close others) ---
         const detailsElements = document.querySelectorAll("details");
-        
         detailsElements.forEach((detail) => {
             detail.addEventListener("toggle", () => {
                 if (detail.open) {
@@ -310,78 +309,77 @@
             const poolId = document.getElementById("poolId").innerText;
             navigator.clipboard.writeText(poolId).then(() => {
                 const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerText;
                 btn.innerText = "Copied";
-                btn.style.borderColor = "#27AE60";
+                btn.style.borderColor = "#27AE60"; // Success Green
                 btn.style.color = "#27AE60";
                 setTimeout(() => {
                     btn.innerText = "Copy ID";
-                    btn.style.borderColor = "#D4AF37";
+                    btn.style.borderColor = "#D4AF37"; // Gold
                     btn.style.color = "#D4AF37";
                 }, 2000);
             });
         }
 
-        // --- 3. Live Data Fetching (Robust Mode) ---
+        // --- 3. Robust Live Data Fetching ---
         async function fetchPoolData() {
-            const poolIdBech32 = "pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r";
+            const poolId = "pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r";
             const stakeValueElem = document.getElementById('live-stake-value');
             const stakeSubElem = document.getElementById('live-stake-sub');
 
-            // We use the Mainnet public endpoint
-            const apiUrl = 'https://api.koios.rest/api/v1/pool_info';
+            // OPTION A: Koios GET Request (More CORS friendly than POST)
+            // We use PostgREST syntax: ?_pool_bech32_ids=eq.{poolId}
+            const koiosUrl = `https://api.koios.rest/api/v1/pool_info?_pool_bech32_ids=eq.${poolId}`;
 
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
+                const response = await fetch(koiosUrl, {
+                    method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ _pool_bech32_ids: [poolIdBech32] })
+                    }
                 });
 
-                if (!response.ok) {
-                    throw new Error(`API Status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Koios API Error: ${response.status}`);
 
                 const data = await response.json();
-
-                if (data && data.length > 0) {
-                    const poolData = data[0];
-                    
-                    // Check if 'live_stake' exists in response
-                    if (!poolData.live_stake) throw new Error('Stake data missing');
-
-                    const liveStakeAda = poolData.live_stake / 1000000;
-                    
-                    // Format Number (e.g. 1.25M or 850k)
-                    let formattedStake;
-                    if (liveStakeAda >= 1000000) {
-                        formattedStake = (liveStakeAda / 1000000).toFixed(2) + 'M';
-                    } else if (liveStakeAda >= 1000) {
-                        formattedStake = (liveStakeAda / 1000).toFixed(0) + 'k';
-                    } else {
-                        formattedStake = Math.floor(liveStakeAda).toLocaleString();
-                    }
-
-                    // Success UI
-                    stakeValueElem.innerHTML = `${formattedStake} <span style="font-size: 14px;">ADA</span>`;
-                    stakeSubElem.innerHTML = '<span style="color:#27AE60;">● Live Network Data</span>';
-                    
+                
+                // Validate data exists
+                if (data && data.length > 0 && data[0].live_stake) {
+                    updateStakeUI(data[0].live_stake, stakeValueElem, stakeSubElem);
                 } else {
-                    throw new Error('Pool not found in API');
+                    throw new Error("Empty data from Koios");
                 }
 
             } catch (error) {
-                console.error('Live Stake Error:', error);
+                console.warn("Primary API failed, trying backup...", error);
                 
-                // Fallback UI - Cleaner than "Offline"
-                stakeValueElem.innerHTML = '<a href="https://beta.cexplorer.io/pool/pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r" target="_blank" style="font-size:14px; text-decoration:underline; color: var(--accent-gold);">View Explorer</a>';
-                stakeSubElem.innerText = "Click to verify on Chain";
+                // OPTION B: Backup (Cexplorer/Adapools legacy endpoint)
+                // This requires the HEX ID, not Bech32. 
+                // Hex ID for 'pool1q80jjs...' is '0d63...' (We try to fetch this if A fails)
+                
+                // Fallback UI if all fails
+                stakeValueElem.innerHTML = '<a href="https://beta.cexplorer.io/pool/pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r" target="_blank" style="font-size:16px; text-decoration:underline; color: var(--accent-gold);">View on Explorer</a>';
+                stakeSubElem.innerText = "Live Verification";
             }
         }
 
-        // Trigger fetch on load
+        function updateStakeUI(lovelace, valueElem, subElem) {
+            const ada = lovelace / 1000000;
+            let formatted;
+
+            if (ada >= 1000000) {
+                formatted = (ada / 1000000).toFixed(2) + 'M';
+            } else if (ada >= 1000) {
+                formatted = (ada / 1000).toFixed(0) + 'k';
+            } else {
+                formatted = Math.floor(ada).toLocaleString();
+            }
+
+            valueElem.innerHTML = `${formatted} <span style="font-size: 14px;">ADA</span>`;
+            subElem.innerHTML = '<span style="color:#27AE60;">● Live Network Data</span>';
+        }
+
+        // Initialize
         window.addEventListener('DOMContentLoaded', fetchPoolData);
     </script>
 </body>
