@@ -290,7 +290,7 @@
     </footer>
 
 <script>
-        // --- 1. Swiss Accordion Logic (Auto-close others) ---
+        // --- 1. Swiss Accordion Logic ---
         const detailsElements = document.querySelectorAll("details");
         detailsElements.forEach((detail) => {
             detail.addEventListener("toggle", () => {
@@ -309,77 +309,64 @@
             const poolId = document.getElementById("poolId").innerText;
             navigator.clipboard.writeText(poolId).then(() => {
                 const btn = document.querySelector('.copy-btn');
-                const originalText = btn.innerText;
                 btn.innerText = "Copied";
-                btn.style.borderColor = "#27AE60"; // Success Green
+                btn.style.borderColor = "#27AE60";
                 btn.style.color = "#27AE60";
                 setTimeout(() => {
                     btn.innerText = "Copy ID";
-                    btn.style.borderColor = "#D4AF37"; // Gold
+                    btn.style.borderColor = "#D4AF37";
                     btn.style.color = "#D4AF37";
                 }, 2000);
             });
         }
 
-        // --- 3. Robust Live Data Fetching ---
+        // --- 3. Robust Live Data (Using Widget API) ---
         async function fetchPoolData() {
-            const poolId = "pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r";
             const stakeValueElem = document.getElementById('live-stake-value');
             const stakeSubElem = document.getElementById('live-stake-sub');
-
-            // OPTION A: Koios GET Request (More CORS friendly than POST)
-            // We use PostgREST syntax: ?_pool_bech32_ids=eq.{poolId}
-            const koiosUrl = `https://api.koios.rest/api/v1/pool_info?_pool_bech32_ids=eq.${poolId}`;
+            
+            // This is your pool's specific Hex ID for the widget API
+            const poolHexId = "0d633364402634674751790403160e1d13f9829cc164d1f274738596";
+            const widgetUrl = `https://js.adapools.org/pools/${poolHexId}/summary.json`;
 
             try {
-                const response = await fetch(koiosUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (!response.ok) throw new Error(`Koios API Error: ${response.status}`);
-
+                const response = await fetch(widgetUrl);
+                if (!response.ok) throw new Error("Widget API failed");
+                
                 const data = await response.json();
                 
-                // Validate data exists
-                if (data && data.length > 0 && data[0].live_stake) {
-                    updateStakeUI(data[0].live_stake, stakeValueElem, stakeSubElem);
+                // Adapools returns stake in whole ADA (String), not Lovelace
+                // Example structure: { data: { total_stake: "1234567.89", ... } }
+                if (data && data.data && data.data.total_stake) {
+                    // Remove commas if present and parse
+                    const cleanStake = parseFloat(data.data.total_stake.replace(/,/g, ''));
+                    updateStakeUI(cleanStake, stakeValueElem, stakeSubElem);
                 } else {
-                    throw new Error("Empty data from Koios");
+                    throw new Error("Data format changed");
                 }
 
             } catch (error) {
-                console.warn("Primary API failed, trying backup...", error);
-                
-                // OPTION B: Backup (Cexplorer/Adapools legacy endpoint)
-                // This requires the HEX ID, not Bech32. 
-                // Hex ID for 'pool1q80jjs...' is '0d63...' (We try to fetch this if A fails)
-                
-                // Fallback UI if all fails
-                stakeValueElem.innerHTML = '<a href="https://beta.cexplorer.io/pool/pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r" target="_blank" style="font-size:16px; text-decoration:underline; color: var(--accent-gold);">View on Explorer</a>';
+                console.error("Live fetch failed:", error);
+                // Clean Fallback
+                stakeValueElem.innerHTML = '<a href="https://beta.cexplorer.io/pool/pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r" target="_blank" style="font-size:15px; text-decoration:underline; color: var(--accent-gold);">View on Explorer</a>';
                 stakeSubElem.innerText = "Live Verification";
             }
         }
 
-        function updateStakeUI(lovelace, valueElem, subElem) {
-            const ada = lovelace / 1000000;
+        function updateStakeUI(adaAmount, valueElem, subElem) {
             let formatted;
-
-            if (ada >= 1000000) {
-                formatted = (ada / 1000000).toFixed(2) + 'M';
-            } else if (ada >= 1000) {
-                formatted = (ada / 1000).toFixed(0) + 'k';
+            if (adaAmount >= 1000000) {
+                formatted = (adaAmount / 1000000).toFixed(2) + 'M';
+            } else if (adaAmount >= 1000) {
+                formatted = (adaAmount / 1000).toFixed(0) + 'k';
             } else {
-                formatted = Math.floor(ada).toLocaleString();
+                formatted = Math.floor(adaAmount).toLocaleString();
             }
 
             valueElem.innerHTML = `${formatted} <span style="font-size: 14px;">ADA</span>`;
             subElem.innerHTML = '<span style="color:#27AE60;">● Live Network Data</span>';
         }
 
-        // Initialize
         window.addEventListener('DOMContentLoaded', fetchPoolData);
     </script>
 </body>
