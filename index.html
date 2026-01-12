@@ -321,7 +321,7 @@
             <div class="metric-item">
                 <h4 data-i18n="met_infra">Infrastructure</h4>
                 <p>100% <span style="font-size: 14px;">ECO</span></p>
-                <span class="sub-text">Architecture</span>
+                <span class="sub-text" data-i18n="met_infra_sub">Dedicated Architecture</span>
             </div>
         </section>
 
@@ -360,12 +360,12 @@
             </div>
         </section>
 
-        <section class="specs-section">
+       <section class="specs-section">
             <h3 style="margin-bottom: 20px; font-size: 24px;" data-i18n="specs_title">Hardware Specifications</h3>
             <div class="specs-container">
                 <div class="spec-row">
                     <div class="spec-label" data-i18n="spec_model">Server Model</div>
-                    <div class="spec-value">Dedicated Bare Metal</div>
+                    <div class="spec-value" data-i18n="spec_val_model">Dedicated Bare Metal</div>
                 </div>
                 <div class="spec-row">
                     <div class="spec-label" data-i18n="spec_cpu">Processor</div>
@@ -430,7 +430,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         // --- TRANSLATIONS ---
         const translations = {
             en: {
@@ -451,6 +451,7 @@
                 met_fixed: "Fixed Cost",
                 met_fixed_sub: "Standard Protocol",
                 met_infra: "Infrastructure",
+                met_infra_sub: "Dedicated Architecture", // Updated
                 pool_label: "Stake Pool ID",
                 btn_copy: "Copy ID",
                 how_delegate: "How to Delegate?",
@@ -463,6 +464,7 @@
                 card3_foot: "Single Pool Alliance",
                 specs_title: "Hardware Specifications",
                 spec_model: "Server Model",
+                spec_val_model: "Dedicated Bare Metal", // Updated
                 spec_cpu: "Processor",
                 spec_ram: "Memory (RAM)",
                 spec_ram_sub: "Enterprise Grade Error Correction Code for stability",
@@ -484,7 +486,7 @@
                 hero_sub2: "Fehlerfreier Betrieb seit dem Incentivized Testnet.",
                 hero_sub3: "Gesichert in der Schweiz.",
                 mn_badge: "Midnight Netzwerk Partner",
-                mn_title: "Night Token Verdienen",
+                mn_title: "Night Token verdienen",
                 mn_text: "Wir erstellen aktiv Blöcke auf dem Midnight Testnet. Durch Delegieren an [000] positionieren Sie sich für potenzielle Belohnungen beim Start des Midnight Mainnets.",
                 mn_faq_q: "Was sind Night Token?",
                 mn_faq_a: "Midnight ist eine Partner-Chain von Cardano mit Fokus auf Datenschutz. Night Token sind die Utility-Token des Netzwerks. Durch Delegieren an einen Partner-Pool wie unseren können Sie diese Token zusätzlich zu Ihren normalen ADA-Rewards verdienen.",
@@ -495,6 +497,7 @@
                 met_fixed: "Fixkosten",
                 met_fixed_sub: "Standard Protokoll",
                 met_infra: "Infrastruktur",
+                met_infra_sub: "Dedizierte Architektur", // Updated
                 pool_label: "Stake Pool ID",
                 btn_copy: "ID Kopieren",
                 how_delegate: "Wie Delegieren?",
@@ -507,6 +510,7 @@
                 card3_foot: "Single Pool Alliance",
                 specs_title: "Hardware Spezifikationen",
                 spec_model: "Server Modell",
+                spec_val_model: "Dediziertes Bare Metal", // Updated
                 spec_cpu: "Prozessor",
                 spec_ram: "Arbeitsspeicher (RAM)",
                 spec_ram_sub: "Enterprise Grade Error Correction Code für Stabilität",
@@ -539,6 +543,7 @@
                 met_fixed: "Coûts Fixes",
                 met_fixed_sub: "Protocole Standard",
                 met_infra: "Infrastructure",
+                met_infra_sub: "Architecture Dédiée", // Updated
                 pool_label: "ID du Stake Pool",
                 btn_copy: "Copier l'ID",
                 how_delegate: "Comment Déléguer ?",
@@ -551,6 +556,7 @@
                 card3_foot: "Single Pool Alliance",
                 specs_title: "Spécifications Matérielles",
                 spec_model: "Modèle Serveur",
+                spec_val_model: "Bare Metal Dédié", // Updated
                 spec_cpu: "Processeur",
                 spec_ram: "Mémoire (RAM)",
                 spec_ram_sub: "Code de correction d'erreur de qualité entreprise",
@@ -583,6 +589,7 @@
                 met_fixed: "固定コスト",
                 met_fixed_sub: "標準プロトコル",
                 met_infra: "インフラ",
+                met_infra_sub: "専用アーキテクチャ", // Updated
                 pool_label: "ステークプールID",
                 btn_copy: "IDをコピー",
                 how_delegate: "委任方法は？",
@@ -595,6 +602,7 @@
                 card3_foot: "シングルプールアライアンス",
                 specs_title: "ハードウェア仕様",
                 spec_model: "サーバーモデル",
+                spec_val_model: "専用ベアメタル", // Updated
                 spec_cpu: "プロセッサー",
                 spec_ram: "メモリ (RAM)",
                 spec_ram_sub: "安定性のためのエンタープライズグレードECC",
@@ -636,7 +644,7 @@
             setLanguage(savedLang);
         });
 
-        // --- CLIPBOARD & MODAL (Existing) ---
+        // --- CLIPBOARD & MODAL ---
         function copyToClipboard() {
             const poolId = document.getElementById("poolId").innerText;
             navigator.clipboard.writeText(poolId).then(() => {
