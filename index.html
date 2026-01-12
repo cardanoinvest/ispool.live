@@ -288,13 +288,27 @@
             <p style="font-size: 11px; opacity: 0.6; margin-top: 5px;">Follow us on <a href="https://x.com/ISP_Cardano" style="text-decoration:underline;">X.com</a></p>
         </div>
     </footer>
+<script>
+        // --- 1. Swiss Accordion Logic (Auto-close others) ---
+        const detailsElements = document.querySelectorAll("details");
+        
+        detailsElements.forEach((detail) => {
+            detail.addEventListener("toggle", () => {
+                if (detail.open) {
+                    detailsElements.forEach((otherDetail) => {
+                        if (otherDetail !== detail && otherDetail.open) {
+                            otherDetail.removeAttribute("open");
+                        }
+                    });
+                }
+            });
+        });
 
-    <script>
+        // --- 2. Clipboard Functionality ---
         function copyToClipboard() {
             const poolId = document.getElementById("poolId").innerText;
             navigator.clipboard.writeText(poolId).then(() => {
                 const btn = document.querySelector('.copy-btn');
-                const originalText = btn.innerText;
                 btn.innerText = "Copied";
                 btn.style.borderColor = "#27AE60";
                 btn.style.color = "#27AE60";
@@ -306,46 +320,67 @@
             });
         }
 
+        // --- 3. Live Data Fetching (Robust Mode) ---
         async function fetchPoolData() {
             const poolIdBech32 = "pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r";
             const stakeValueElem = document.getElementById('live-stake-value');
             const stakeSubElem = document.getElementById('live-stake-sub');
 
+            // We use the Mainnet public endpoint
+            const apiUrl = 'https://api.koios.rest/api/v1/pool_info';
+
             try {
-                // Fetch from Koios API
-                const response = await fetch('https://api.koios.rest/api/v1/pool_info', {
+                const response = await fetch(apiUrl, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({ _pool_bech32_ids: [poolIdBech32] })
                 });
 
-                if (!response.ok) throw new Error('API Error');
+                if (!response.ok) {
+                    throw new Error(`API Status: ${response.status}`);
+                }
 
                 const data = await response.json();
 
                 if (data && data.length > 0) {
                     const poolData = data[0];
+                    
+                    // Check if 'live_stake' exists in response
+                    if (!poolData.live_stake) throw new Error('Stake data missing');
+
                     const liveStakeAda = poolData.live_stake / 1000000;
                     
+                    // Format Number (e.g. 1.25M or 850k)
                     let formattedStake;
                     if (liveStakeAda >= 1000000) {
                         formattedStake = (liveStakeAda / 1000000).toFixed(2) + 'M';
                     } else if (liveStakeAda >= 1000) {
                         formattedStake = (liveStakeAda / 1000).toFixed(0) + 'k';
                     } else {
-                        formattedStake = liveStakeAda.toFixed(0);
+                        formattedStake = Math.floor(liveStakeAda).toLocaleString();
                     }
 
+                    // Success UI
                     stakeValueElem.innerHTML = `${formattedStake} <span style="font-size: 14px;">ADA</span>`;
                     stakeSubElem.innerHTML = '<span style="color:#27AE60;">● Live Network Data</span>';
+                    
+                } else {
+                    throw new Error('Pool not found in API');
                 }
+
             } catch (error) {
-                // Graceful fallback - looks like a button/link instead of an error
-                stakeValueElem.innerHTML = '<a href="https://beta.cexplorer.io/pool/pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r" target="_blank" style="font-size:16px; text-decoration:underline; opacity:0.8;">View on Explorer</a>';
-                stakeSubElem.innerText = "Data available on Mainnet";
+                console.error('Live Stake Error:', error);
+                
+                // Fallback UI - Cleaner than "Offline"
+                stakeValueElem.innerHTML = '<a href="https://beta.cexplorer.io/pool/pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r" target="_blank" style="font-size:14px; text-decoration:underline; color: var(--accent-gold);">View Explorer</a>';
+                stakeSubElem.innerText = "Click to verify on Chain";
             }
         }
 
+        // Trigger fetch on load
         window.addEventListener('DOMContentLoaded', fetchPoolData);
     </script>
 </body>
