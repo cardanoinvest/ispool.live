@@ -51,6 +51,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <style>
         :root {
             --bg-dark: #0B1A2E;--bg-card: #162B45;--accent-gold: #C9A84C;
@@ -62,8 +64,8 @@
         body{font-family:'Inter','Noto Sans JP',sans-serif;background:var(--bg-dark);color:var(--text-white);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
         .skip-link{position:absolute;top:-100%;left:50%;transform:translateX(-50%);background:var(--accent-gold);color:var(--bg-dark);padding:8px 16px;font-weight:600;font-size:13px;z-index:9999;border-radius:0 0 4px 4px;transition:top .2s}
         .skip-link:focus{top:0}
-        .bg-mesh{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:-1}
-        .bg-mesh::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 30%, transparent 0%, rgba(11,26,46,0.4) 40%, var(--bg-dark) 75%)}
+        .bg-mesh{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:-1;mask-image:radial-gradient(ellipse 120% 120% at 50% 40%,black 20%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse 120% 120% at 50% 40%,black 20%,transparent 70%)}
+        .bg-mesh::after{display:none}
         .ambient-glow{position:fixed;pointer-events:none;z-index:-1;width:800px;height:800px;border-radius:50%;filter:blur(160px);opacity:.06}
         .ambient-glow--gold{top:-200px;right:-250px;background:var(--accent-gold)}
         .ambient-glow--purple{bottom:15%;left:-300px;background:var(--accent-purple)}
@@ -74,7 +76,7 @@
         .section-label{font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--accent-gold);margin-bottom:8px;display:block}
 
         /* NAV */
-        nav{padding:18px 0;border-bottom:1px solid var(--border);background:rgba(11,26,46,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:sticky;top:0;z-index:100}
+        nav{padding:18px 0;border-bottom:none;background:linear-gradient(to bottom,rgba(11,26,46,.92),rgba(11,26,46,.85) 80%,rgba(11,26,46,0));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);position:sticky;top:0;z-index:100}
         .nav-content{display:flex;justify-content:space-between;align-items:center}
         .logo-container{display:flex;align-items:center;gap:14px}
         .swiss-cross{width:24px;height:24px;background:var(--swiss-red);position:relative;display:flex;justify-content:center;align-items:center;border-radius:2px;box-shadow:0 2px 8px rgba(216,0,0,.3);flex-shrink:0}
@@ -244,7 +246,6 @@
         .wallet-btn{padding:8px 14px;font-size:12px;font-weight:600;border:1px solid var(--border);background:rgba(0,0,0,.2);color:var(--text-white);border-radius:2px;cursor:pointer;transition:all .2s;display:inline-block}
         .wallet-btn:hover{border-color:var(--accent-gold);color:var(--accent-gold)}
         .qr-modal-body{display:flex;flex-direction:column;align-items:center;padding:20px 0}
-        .qr-canvas{background:#fff;padding:16px;border-radius:4px;margin-bottom:16px}
         .qr-id-text{font-family:monospace;font-size:11px;color:var(--text-grey);word-break:break-all;text-align:center;max-width:320px}
         @keyframes modalIn{from{opacity:0;transform:translateY(-16px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 
@@ -480,7 +481,7 @@
             <button type="button" class="close-modal" onclick="closeQRModal()" aria-label="Close">&times;</button>
             <h3 id="qrModalTitle" style="margin-bottom:10px;color:var(--accent-gold)">Pool ID — QR Code</h3>
             <div class="qr-modal-body">
-                <canvas id="qrCanvas" class="qr-canvas" width="200" height="200"></canvas>
+                <div id="qrCode" style="background:#fff;padding:16px;border-radius:4px;display:inline-block;margin-bottom:16px"></div>
                 <div class="qr-id-text">pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r</div>
             </div>
         </div>
@@ -542,16 +543,14 @@ function openQRModal(){openM(qm);generateQR()}function closeQRModal(){closeM(qm)
     });
 });
 
+let qrGenerated=false;
 function generateQR(){
-    const cv=document.getElementById('qrCanvas'),ctx=cv.getContext('2d'),txt=POOL_BECH32,s=200;cv.width=s;cv.height=s;
-    ctx.fillStyle='#fff';ctx.fillRect(0,0,s,s);const cs=5,gs=Math.floor(s/cs);
-    ctx.fillStyle='#0B1A2E';
-    function drawF(x,y){ctx.fillRect(x,y,7*cs,7*cs);ctx.fillStyle='#fff';ctx.fillRect(x+cs,y+cs,5*cs,5*cs);ctx.fillStyle='#0B1A2E';ctx.fillRect(x+2*cs,y+2*cs,3*cs,3*cs)}
-    drawF(2*cs,2*cs);ctx.fillStyle='#0B1A2E';drawF((gs-9)*cs,2*cs);ctx.fillStyle='#0B1A2E';drawF(2*cs,(gs-9)*cs);
-    let h=0;for(let i=0;i<txt.length;i++)h=((h<<5)-h+txt.charCodeAt(i))|0;
-    ctx.fillStyle='#0B1A2E';
-    for(let y=12;y<gs-2;y++)for(let x=12;x<gs-2;x++){h=((h*1103515245+12345)&0x7fffffff);if(h%3===0)ctx.fillRect(x*cs,y*cs,cs,cs)}
-    const cx=s/2,cy=s/2;ctx.fillStyle='#fff';ctx.fillRect(cx-18,cy-18,36,36);ctx.fillStyle='#D80000';ctx.fillRect(cx-12,cy-12,24,24);ctx.fillStyle='#fff';ctx.fillRect(cx-8,cy-2,16,4);ctx.fillRect(cx-2,cy-8,4,16);
+    if(qrGenerated)return;
+    const el=document.getElementById('qrCode');
+    if(typeof QRCode!=='undefined'){
+        new QRCode(el,{text:POOL_BECH32,width:180,height:180,colorDark:'#0B1A2E',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+        qrGenerated=true;
+    } else { el.textContent='QR library failed to load'; }
 }
 
 function bfHeaders(){ return { 'project_id': BLOCKFROST_PROJECT_ID } }
