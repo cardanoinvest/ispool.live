@@ -487,7 +487,13 @@
 
 <script>
 const POOL_BECH32='pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r';
-const KOIOS='https://api.koios.rest/api/v1';
+
+// ── BLOCKFROST CONFIG ──────────────────────────────────────
+// Get your FREE project_id at https://blockfrost.io (takes 30 seconds)
+// 1. Sign up → 2. Create a project (Cardano Mainnet) → 3. Copy project_id below
+const BLOCKFROST_PROJECT_ID = 'mainnet5cS9aF2rjoC1cc6oBkV8eUxyjYh03IoP';
+const BF = 'https://cardano-mainnet.blockfrost.io/api/v0';
+// ───────────────────────────────────────────────────────────
 
 const T={
 en:{nav_explorer:"Pool Explorer",hero_title:'Institutional Trust.<br><span class="gold-line">Genesis Legacy.</span>',hero_sub1:"The 4th pool ever established on Mainnet.",hero_sub2:"Operating flawlessly since the Incentivized Testnet.",hero_sub3:"Secured in Switzerland.",live_label:"LIVE DATA",live_stake:"Live Stake",live_delegators:"Delegators",live_blocks:"Lifetime Blocks",live_roa:"ROA (Annualized)",mn_badge:"Midnight Network Partner",mn_title:"Earn Night Tokens",mn_text:"We are actively creating blocks on the Midnight Testnet. By delegating to [000], you position yourself for potential rewards upon the Midnight Mainnet launch.",mn_faq_q:"What are Night Tokens?",mn_faq_a:"Midnight is a partner chain to Cardano focused on data protection. Night Tokens are the utility token of the Midnight network. By delegating ADA to a partner pool like ours, you may be eligible to earn these tokens in addition to your standard ADA rewards.",met_uptime:"Uptime",met_uptime_sub:"24/7 Monitoring",met_var:"Variable Fee",met_var_sub:"Max Delegation Yield",met_fixed:"Fixed Cost",met_fixed_sub:"Standard Protocol",met_infra:"Infrastructure",met_infra_sub:"Dedicated Architecture",pool_label:"Stake Pool ID",btn_copy:"Copy ID",how_delegate:"How to Delegate?",perf_label:"Performance",perf_title:"Epoch History",perf_avg:"Avg. ROA",perf_epochs:"Epochs Active",perf_minted:"Blocks Minted",perf_loading:"Loading epoch data…",card1_title:"Legacy & Trust",card1_text:"We are the 4th Cardano Stake Pool ever created on Mainnet. Our expert IT team has been operating flawlessly since the incentivized testnet (Beta).",card2_title:"Swiss Jurisdiction",card2_text:"Hosted on private bare-metal servers in Switzerland. We utilize 100% ECO energy, combining Swiss privacy standards with sustainable blockchain operations.",card3_title:"Decentralization",card3_text:"We are a proud member of the Single Pool Alliance. We refuse to run multiple pools or leverage stake, ensuring the Cardano network remains secure and distributed.",card3_foot:"Single Pool Alliance",op_label:"Pool Operator",op_section_title:"Who We Are",op_title:"Swiss-Based Infrastructure Team",op_text:"We are a dedicated team of IT professionals based in Zurich, Switzerland with deep expertise in network infrastructure, security, and blockchain technology. As one of the earliest Cardano stake pools — the 4th on Mainnet — we have been securing the network from the very beginning.",op_since:"Since 2020",op_b1:"Genesis Pool",op_b2:"Swiss Hosted",op_b3:"Single Pool Alliance",op_b4:"Midnight Partner",specs_title:"Hardware Specifications",spec_model:"Server Model",spec_val_model:"Dedicated Bare Metal",spec_cpu:"Processor",spec_ram:"Memory (RAM)",spec_ram_sub:"Enterprise Grade Error Correction Code for stability",spec_storage:"Storage",spec_storage_sub:"Configured in Software RAID 1 for data redundancy",spec_eff:"Efficiency",spec_eff_sub:"High-performance multitasking with minimal energy consumption",foot_tag:"Professional Staking Infrastructure.",modal_title:"How to Delegate",modal_text:"Staking your ADA with [000] is non-custodial and secure. Your funds never leave your wallet.",wallet_label:"Open in your wallet",step_1:"Open your wallet (Daedalus, Yoroi, Lace, or Adalite).",step_2:'Go to the "Staking" or "Delegation" center and search for Ticker: <strong>000</strong>.',step_3:'Click "Delegate". Confirm the transaction. You are now earning rewards!'},
@@ -547,27 +553,34 @@ function generateQR(){
     const cx=s/2,cy=s/2;ctx.fillStyle='#fff';ctx.fillRect(cx-18,cy-18,36,36);ctx.fillStyle='#D80000';ctx.fillRect(cx-12,cy-12,24,24);ctx.fillStyle='#fff';ctx.fillRect(cx-8,cy-2,16,4);ctx.fillRect(cx-2,cy-8,4,16);
 }
 
+function bfHeaders(){ return { 'project_id': BLOCKFROST_PROJECT_ID } }
+
 async function fetchPoolStats(){
+    if(BLOCKFROST_PROJECT_ID==='YOUR_PROJECT_ID_HERE'){
+        console.warn('Blockfrost: Add your project_id to enable live data. Get one free at https://blockfrost.io');
+        ['liveStake','liveDelegators','liveBlocks','liveROA'].forEach(id=>upd(id,'—'));
+        chartFallback();return;
+    }
     try{
-        const r=await fetch(KOIOS+'/pool_info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({_pool_bech32_ids:[POOL_BECH32]})});
-        if(!r.ok)throw new Error('err');const d=await r.json();
-        if(d&&d.length>0){const p=d[0];
-            const st=p.live_stake?parseInt(p.live_stake)/1e6:null;
-            upd('liveStake',st?fmtADA(st):'—');
-            upd('liveDelegators',p.live_delegators||'—');
-            upd('liveBlocks',p.block_count?p.block_count.toLocaleString():'—');
-            if(p.pool_status==='registered')fetchHistory();
-        }
-    }catch(e){console.warn('Stats fetch failed:',e);['liveStake','liveDelegators','liveBlocks','liveROA'].forEach(id=>upd(id,'—'))}
+        const r=await fetch(BF+'/pools/'+POOL_BECH32,{headers:bfHeaders()});
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        const p=await r.json();
+        const st=p.live_stake?parseInt(p.live_stake)/1e6:null;
+        upd('liveStake',st?fmtADA(st):'—');
+        upd('liveDelegators',p.live_delegators!=null?p.live_delegators.toLocaleString():'—');
+        upd('liveBlocks',p.blocks_minted!=null?p.blocks_minted.toLocaleString():'—');
+        fetchHistory();
+    }catch(e){console.warn('Pool stats fetch failed:',e);['liveStake','liveDelegators','liveBlocks','liveROA'].forEach(id=>upd(id,'—'))}
 }
 
 async function fetchHistory(){
     try{
-        const r=await fetch(KOIOS+'/pool_history?_pool_bech32='+POOL_BECH32+'&limit=30');
-        if(!r.ok)throw new Error('err');const d=await r.json();
+        const r=await fetch(BF+'/pools/'+POOL_BECH32+'/history?order=desc&count=30',{headers:bfHeaders()});
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        const d=await r.json();
         if(d&&d.length>0){
-            const wr=d.filter(e=>parseFloat(e.deleg_rewards||0)>0);
-            if(wr.length>0){let tr=0;wr.forEach(e=>{const rw=parseFloat(e.deleg_rewards)/1e6,sk=parseFloat(e.active_stake)/1e6;if(sk>0)tr+=(rw/sk)*73*100});
+            const wr=d.filter(e=>parseFloat(e.rewards||0)>0);
+            if(wr.length>0){let tr=0;wr.forEach(e=>{const rw=parseFloat(e.rewards)/1e6,sk=parseFloat(e.active_stake)/1e6;if(sk>0)tr+=(rw/sk)*73*100});
             const avg=tr/wr.length;upd('liveROA',avg.toFixed(2)+'%');document.getElementById('perfAvgROA').textContent=avg.toFixed(2)+'%'}
             document.getElementById('perfEpochs').textContent=d.length+'+';
             buildChart(d.slice(0,20).reverse());
@@ -580,10 +593,10 @@ function fmtADA(a){return a>=1e6?(a/1e6).toFixed(2)+'M ₳':a>=1e3?(a/1e3).toFix
 
 function buildChart(eps){
     const c=document.getElementById('chartContainer'),p=document.getElementById('chartPlaceholder');if(p)p.remove();
-    const mx=Math.max(...eps.map(e=>parseInt(e.epoch_block_cnt||0)),1);
+    const mx=Math.max(...eps.map(e=>parseInt(e.blocks||0)),1);
     let h='<div class="chart-bars">';
-    eps.forEach(e=>{const b=parseInt(e.epoch_block_cnt||0),pct=Math.max((b/mx)*100,2),m=b===0;
-        h+='<div class="chart-bar-wrap" title="Epoch '+e.epoch_no+': '+b+' blocks"><div class="chart-bar'+(m?' missed':'')+'" style="height:'+pct+'%"></div><div class="chart-bar-label">'+e.epoch_no+'</div></div>'});
+    eps.forEach(e=>{const b=parseInt(e.blocks||0),pct=Math.max((b/mx)*100,2),m=b===0;
+        h+='<div class="chart-bar-wrap" title="Epoch '+e.epoch+': '+b+' blocks"><div class="chart-bar'+(m?' missed':'')+'" style="height:'+pct+'%"></div><div class="chart-bar-label">'+e.epoch+'</div></div>'});
     h+='</div>';c.innerHTML=h;
 }
 function chartFallback(){const p=document.getElementById('chartPlaceholder');if(p)p.textContent='Visit the Pool Explorer for full stats.'}
