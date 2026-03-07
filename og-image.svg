@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0B1A2E"/>
+      <stop offset="100%" style="stop-color:#162B45"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#C9A84C"/>
+      <stop offset="100%" style="stop-color:#E8D48B"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Swiss cross -->
+  <rect x="80" y="240" width="80" height="80" fill="#D80000" rx="6"/>
+  <rect x="107" y="258" width="26" height="44" fill="#FFF" rx="2"/>
+  <rect x="98" y="267" width="44" height="26" fill="#FFF" rx="2"/>
+  <!-- Title -->
+  <text x="200" y="275" font-family="Georgia,serif" font-size="48" font-weight="700" fill="#FFFFFF">Switzerland Investment Pool</text>
+  <text x="200" y="320" font-family="Georgia,serif" font-size="36" fill="#C9A84C">[000]</text>
+  <!-- Tagline -->
+  <text x="200" y="370" font-family="Arial,sans-serif" font-size="22" fill="#B0B8C6">Institutional Grade Cardano Staking · Swiss Jurisdiction</text>
+  <!-- Border accent -->
+  <rect x="0" y="0" width="1200" height="4" fill="url(#gold)"/>
+  <rect x="0" y="626" width="1200" height="4" fill="url(#gold)"/>
+</svg>
