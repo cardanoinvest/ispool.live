@@ -18,7 +18,10 @@
     <meta property="og:url" content="https://ispool.live/">
     <meta property="og:title" content="Switzerland Investment Pool [000] — Cardano Staking">
     <meta property="og:description" content="The 4th pool ever created on Mainnet. Swiss Jurisdiction. 100% ECO Energy. Midnight Network Partner.">
-    <meta property="og:image" content="https://ispool.live/og-image.svg">
+    <meta property="og:image" content="https://ispool.live/og-image.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:locale" content="en_US">
     <meta property="og:locale:alternate" content="de_CH">
     <meta property="og:locale:alternate" content="fr_CH">
@@ -28,10 +31,11 @@
     <meta name="twitter:site" content="@ISP_Cardano">
     <meta name="twitter:title" content="Switzerland Investment Pool [000]">
     <meta name="twitter:description" content="Institutional grade Cardano Staking. Swiss Jurisdiction. Midnight Network Partner.">
-    <meta name="twitter:image" content="https://ispool.live/og-image.svg">
+    <meta name="twitter:image" content="https://ispool.live/og-image.png">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23D80000' rx='4'/%3E%3Cpath fill='%23FFF' d='M14 6h4v8h8v4h-8v8h-4v-8H6v-4h8z'/%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%23D80000' rx='20'/%3E%3Cpath fill='%23FFF' d='M78 30h24v50h50v24H102v50H78v-50H28V80h50z'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
     
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://cardano-mainnet.blockfrost.io; img-src 'self' data:;">
     <meta name="theme-color" content="#0B1A2E">
@@ -92,8 +96,9 @@
         .logo-text{font-size:15px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
         .logo-text span{color:var(--accent-gold)}
         .nav-right{display:flex;align-items:center;gap:20px}
-        .lang-switch{display:flex;gap:10px;font-size:12px;font-weight:600;color:var(--text-grey);border-right:1px solid var(--border);padding-right:20px}
-        .lang-opt{cursor:pointer;transition:color .2s}
+        .lang-switch{display:flex;gap:0;font-size:12px;font-weight:600;color:var(--text-grey);border-right:1px solid var(--border);padding-right:20px}
+        .lang-opt{cursor:pointer;transition:color .2s;padding:0 8px;border-right:1px solid var(--border)}
+        .lang-opt:last-child{border-right:none;padding-right:0}
         .lang-opt:hover,.lang-opt.active{color:var(--accent-gold)}
         .social-link{display:flex;align-items:center;gap:8px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-grey)}
         .social-link:hover{color:var(--accent-gold)}
@@ -194,7 +199,7 @@
         .chart-placeholder{color:var(--text-grey);font-size:14px;text-align:center;padding:60px 20px}
         .chart-legend{display:flex;gap:20px;margin-top:15px;justify-content:flex-end}
         .chart-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-grey)}
-        .chart-legend-dot{width:10px;height:10px;border-radius:2px}
+        .chart-legend-dot{width:10px;height:10px;border-radius:2px;background:var(--accent-gold)}
 
         /* CARDS */
         .grid-section{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-bottom:60px}
@@ -206,6 +211,8 @@
         .card h3{font-size:20px;margin-bottom:12px}
         .card p{color:var(--text-grey);font-size:14px;margin-bottom:20px;line-height:1.7}
         .card-footer{font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-top:auto}
+        .card-footer--gold{color:var(--accent-gold)}
+        .card-footer--red{color:var(--swiss-red)}
 
         /* OPERATOR */
         .operator-section{margin-bottom:80px}
@@ -285,7 +292,7 @@
             .chart-bar-label{display:none}
             .nav-toggle{display:block}
             .nav-right{position:fixed;top:61px;left:0;right:0;background:rgba(11,26,46,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);flex-direction:column;align-items:center;gap:20px;padding:30px 24px;border-bottom:1px solid var(--border);transform:translateY(-120%);opacity:0;transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .25s ease;pointer-events:none}
-            .nav-right.open{transform:translateY(0);opacity:1;pointer-events:all}
+            .nav-right.open{transform:translateY(0);opacity:1;pointer-events:auto}
             .lang-switch{border-right:none;padding-right:0;border-bottom:1px solid var(--border);padding-bottom:15px}
         }
         @media(max-width:480px){.hero h1{font-size:28px}.metrics-strip{grid-template-columns:1fr}.grid-section{grid-template-columns:1fr}.logo-text{font-size:12px}}
@@ -294,6 +301,16 @@
             *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}
             .reveal{opacity:1;transform:none}
             .live-stat-value.loading{animation:none;-webkit-text-fill-color:var(--text-grey)}
+        }
+
+        @media print{
+            body{background:#fff;color:#000}
+            .bg-mesh,.ambient-glow,.network-viz,nav,.hero-visual,.chart-container,.chart-legend{display:none}
+            *{color:#000 !important;border-color:#ccc !important;box-shadow:none !important;text-shadow:none !important}
+            .card,.midnight-feature,.operator-card,.pool-id-section,.specs-container,.live-stats-banner{background:#fff !important;border:1px solid #ccc !important}
+            .section-label,.midnight-badge,.accent-gold{color:#333 !important}
+            a[href]::after{content:' (' attr(href) ')';font-size:11px;color:#666}
+            .modal{display:none !important}
         }
     </style>
 </head>
@@ -313,9 +330,9 @@
             <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" onclick="toggleMobileNav()"><span></span><span></span><span></span></button>
             <div class="nav-right" id="navRight">
                 <div class="lang-switch" role="group" aria-label="Language">
-                    <span class="lang-opt active" onclick="setLanguage('en')" role="button" tabindex="0" aria-label="English">EN</span> |
-                    <span class="lang-opt" onclick="setLanguage('de')" role="button" tabindex="0" aria-label="Deutsch">DE</span> |
-                    <span class="lang-opt" onclick="setLanguage('fr')" role="button" tabindex="0" aria-label="Français">FR</span> |
+                    <span class="lang-opt active" onclick="setLanguage('en')" role="button" tabindex="0" aria-label="English">EN</span>
+                    <span class="lang-opt" onclick="setLanguage('de')" role="button" tabindex="0" aria-label="Deutsch">DE</span>
+                    <span class="lang-opt" onclick="setLanguage('fr')" role="button" tabindex="0" aria-label="Français">FR</span>
                     <span class="lang-opt" onclick="setLanguage('ja')" role="button" tabindex="0" aria-label="日本語">JP</span>
                 </div>
                 <a href="https://x.com/ISP_Cardano" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow on X">
@@ -419,19 +436,19 @@
                 </div>
             </div>
             <div class="chart-container" id="chartContainer"><div class="chart-placeholder" id="chartPlaceholder" data-i18n="perf_loading">Loading epoch data…</div></div>
-            <div class="chart-legend"><div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--accent-gold)"></div><span data-i18n="perf_minted">Blocks Minted</span></div></div>
+            <div class="chart-legend"><div class="chart-legend-item"><div class="chart-legend-dot"></div><span data-i18n="perf_minted">Blocks Minted</span></div></div>
         </section>
 
         <section class="grid-section" aria-label="Features">
             <article class="card reveal"><div>
                 <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 <h3 data-i18n="card1_title">Legacy & Trust</h3><p data-i18n="card1_text">We are the 4th Cardano Stake Pool ever created on Mainnet. Our expert IT team has been operating flawlessly since the incentivized testnet (Beta).</p>
-            </div><div class="card-footer" style="color:var(--accent-gold)">Est. 2020</div></article>
+            </div><div class="card-footer card-footer--gold">Est. 2020</div></article>
 
             <article class="card reveal reveal-delay-1"><div>
                 <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <h3 data-i18n="card2_title">Swiss Jurisdiction</h3><p data-i18n="card2_text">Hosted on private bare-metal servers in Switzerland. We utilize 100% ECO energy, combining Swiss privacy standards with sustainable blockchain operations.</p>
-            </div><div class="card-footer" style="color:var(--swiss-red)">Zurich / Switzerland</div></article>
+            </div><div class="card-footer card-footer--red">Zurich / Switzerland</div></article>
 
             <article class="card reveal reveal-delay-2"><div>
                 <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>
@@ -515,16 +532,21 @@
 const POOL_BECH32='pool1q80jjs53w0fx836n8g38gtdwr8ck5zre3da90peuxn84sj3cu0r';
 
 // ── BLOCKFROST CONFIG ──────────────────────────────────────
-// ⚠️  SECURITY NOTE: This key is exposed in client-side code.
-//     For production, use a backend proxy (Cloudflare Worker, Netlify Function)
-//     to keep the key server-side. Blockfrost free-tier keys have rate limits
-//     that anyone can exhaust if they extract this key from your page source.
-//     See: https://docs.blockfrost.io/#section/Limits
-// Get your FREE project_id at https://blockfrost.io (takes 30 seconds)
-// 1. Sign up → 2. Create a project (Cardano Mainnet) → 3. Copy project_id below
+// This key is exposed in client-side code, but secured via Blockfrost settings:
+//   1. ORIGINS allowlist → only https://ispool.live can use this key
+//   2. API ENDPOINT allowlist → only /pools/* endpoints are enabled
+// This means even if someone extracts the key, it only works from your
+// domain and can only read pool data (no wallets, transactions, etc.).
 const BLOCKFROST_PROJECT_ID = 'mainnet5cS9aF2rjoC1cc6oBkV8eUxyjYh03IoP';
 const BLOCKFROST_BASE = 'https://cardano-mainnet.blockfrost.io/api/v0';
+const FETCH_TIMEOUT_MS = 10000;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 // ───────────────────────────────────────────────────────────
+
+function fetchWithTimeout(url,opts={},ms=FETCH_TIMEOUT_MS){const c=new AbortController();const t=setTimeout(()=>c.abort(),ms);return fetch(url,{...opts,signal:c.signal}).finally(()=>clearTimeout(t))}
+
+function cacheGet(key){try{const raw=sessionStorage.getItem(key);if(!raw)return null;const{data,ts}=JSON.parse(raw);if(Date.now()-ts>CACHE_TTL_MS)return null;return data}catch(e){return null}}
+function cacheSet(key,data){try{sessionStorage.setItem(key,JSON.stringify({data,ts:Date.now()}))}catch(e){}}
 
 const translations={
 en:{nav_explorer:"Pool Explorer",hero_title:'Institutional Trust.<br><span class="gold-line">Genesis Legacy.</span>',hero_sub1:"The 4th pool ever established on Mainnet.",hero_sub2:"Operating flawlessly since the Incentivized Testnet.",hero_sub3:"Secured in Switzerland.",live_label:"LIVE DATA",live_stake:"Live Stake",live_delegators:"Delegators",live_blocks:"Lifetime Blocks",live_roa:"ROA (Annualized)",mn_badge:"Midnight Network Partner",mn_title:"Earn Night Tokens",mn_text:"We are actively creating blocks on the Midnight Testnet. By delegating to [000], you position yourself for potential rewards upon the Midnight Mainnet launch.",mn_faq_q:"What are Night Tokens?",mn_faq_a:"Midnight is a partner chain to Cardano focused on data protection. Night Tokens are the utility token of the Midnight network. By delegating ADA to a partner pool like ours, you may be eligible to earn these tokens in addition to your standard ADA rewards.",met_uptime:"Uptime",met_uptime_sub:"24/7 Monitoring",met_var:"Variable Fee",met_var_sub:"Max Delegation Yield",met_fixed:"Fixed Cost",met_fixed_sub:"Standard Protocol",met_infra:"Infrastructure",met_infra_sub:"Dedicated Architecture",pool_label:"Stake Pool ID",btn_copy:"Copy ID",how_delegate:"How to Delegate?",perf_label:"Performance",perf_title:"Epoch History",perf_avg:"Avg. ROA",perf_epochs:"Epochs Active",perf_minted:"Blocks Minted",perf_loading:"Loading epoch data…",card1_title:"Legacy & Trust",card1_text:"We are the 4th Cardano Stake Pool ever created on Mainnet. Our expert IT team has been operating flawlessly since the incentivized testnet (Beta).",card2_title:"Swiss Jurisdiction",card2_text:"Hosted on private bare-metal servers in Switzerland. We utilize 100% ECO energy, combining Swiss privacy standards with sustainable blockchain operations.",card3_title:"Decentralization",card3_text:"We are a proud member of the Single Pool Alliance. We refuse to run multiple pools or leverage stake, ensuring the Cardano network remains secure and distributed.",card3_foot:"Single Pool Alliance",op_label:"Pool Operator",op_section_title:"Who We Are",op_title:"Swiss-Based Infrastructure Team",op_text:"We are a dedicated team of IT professionals based in Zurich, Switzerland with deep expertise in network infrastructure, security, and blockchain technology. As one of the earliest Cardano stake pools — the 4th on Mainnet — we have been securing the network from the very beginning.",op_since:"Since 2020",op_b1:"Genesis Pool",op_b2:"Swiss Hosted",op_b3:"Single Pool Alliance",op_b4:"Midnight Partner",specs_title:"Hardware Specifications",spec_model:"Server Model",spec_val_model:"Dedicated Bare Metal",spec_cpu:"Processor",spec_ram:"Memory (RAM)",spec_ram_sub:"Enterprise Grade Error Correction Code for stability",spec_storage:"Storage",spec_storage_sub:"Configured in Software RAID 1 for data redundancy",spec_eff:"Efficiency",spec_eff_sub:"High-performance multitasking with minimal energy consumption",foot_tag:"Professional Staking Infrastructure.",modal_title:"How to Delegate",modal_text:"Staking your ADA with [000] is non-custodial and secure. Your funds never leave your wallet.",wallet_label:"Open in your wallet",step_1:"Open your wallet (Daedalus, Yoroi, Lace, or Adalite).",step_2:'Go to the "Staking" or "Delegation" center and search for Ticker: <strong>000</strong>.',step_3:'Click "Delegate". Confirm the transaction. You are now earning rewards!'},
@@ -605,24 +627,35 @@ async function fetchPoolStats(){
         ['liveStake','liveDelegators','liveBlocks','liveROA'].forEach(id=>updateStatElement(id,'—'));
         chartFallback();return;
     }
+    const cached=cacheGet('pool_stats');
+    if(cached){applyPoolStats(cached);fetchHistory();return}
     try{
-        const response=await fetch(BLOCKFROST_BASE+'/pools/'+POOL_BECH32,{headers:blockfrostHeaders()});
+        const response=await fetchWithTimeout(BLOCKFROST_BASE+'/pools/'+POOL_BECH32,{headers:blockfrostHeaders()});
         if(!response.ok)throw new Error('Blockfrost API returned HTTP '+response.status);
         const pool=await response.json();
         if(!pool||typeof pool!=='object')throw new Error('Invalid pool data received');
-        const liveStake=(pool.live_stake&&!isNaN(pool.live_stake))?parseInt(pool.live_stake)/1e6:null;
-        updateStatElement('liveStake',liveStake?formatADA(liveStake):'—');
-        updateStatElement('liveDelegators',pool.live_delegators!=null?Number(pool.live_delegators).toLocaleString():'—');
-        updateStatElement('liveBlocks',pool.blocks_minted!=null?Number(pool.blocks_minted).toLocaleString():'—');
+        cacheSet('pool_stats',pool);
+        applyPoolStats(pool);
         fetchHistory();
     }catch(e){console.warn('Pool stats fetch failed:',e.message);['liveStake','liveDelegators','liveBlocks','liveROA'].forEach(id=>updateStatElement(id,'—'));chartFallback()}
+}
+function applyPoolStats(pool){
+    const liveStake=(pool.live_stake&&!isNaN(pool.live_stake))?parseInt(pool.live_stake)/1e6:null;
+    updateStatElement('liveStake',liveStake?formatADA(liveStake):'—');
+    updateStatElement('liveDelegators',pool.live_delegators!=null?Number(pool.live_delegators).toLocaleString():'—');
+    updateStatElement('liveBlocks',pool.blocks_minted!=null?Number(pool.blocks_minted).toLocaleString():'—');
 }
 
 async function fetchHistory(){
     try{
-        const r=await fetch(BLOCKFROST_BASE+'/pools/'+POOL_BECH32+'/history?order=desc&count=30',{headers:blockfrostHeaders()});
-        if(!r.ok)throw new Error('HTTP '+r.status);
-        const d=await r.json();
+        const cached=cacheGet('pool_history');
+        let d;
+        if(cached){d=cached}else{
+            const r=await fetchWithTimeout(BLOCKFROST_BASE+'/pools/'+POOL_BECH32+'/history?order=desc&count=30',{headers:blockfrostHeaders()});
+            if(!r.ok)throw new Error('HTTP '+r.status);
+            d=await r.json();
+            cacheSet('pool_history',d);
+        }
         if(d&&d.length>0){
             const wr=d.filter(e=>parseFloat(e.rewards||0)>0);
             if(wr.length>0){let tr=0;wr.forEach(e=>{const rw=parseFloat(e.rewards)/1e6,sk=parseFloat(e.active_stake)/1e6;if(sk>0)tr+=(rw/sk)*73*100});
