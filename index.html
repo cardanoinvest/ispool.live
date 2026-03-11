@@ -60,10 +60,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cardano-mainnet.blockfrost.io" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
     <!-- Noto Sans JP loaded on demand when Japanese is selected (see loadJapaneseFont in JS) -->
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+    <!-- QR library loaded on demand when QR button is clicked -->
     
     <style>
         :root {
@@ -78,7 +79,7 @@
         .skip-link:focus{top:0}
         .bg-mesh{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:-1;mask-image:radial-gradient(ellipse 120% 120% at 50% 40%,black 20%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse 120% 120% at 50% 40%,black 20%,transparent 70%)}
         .bg-mesh::after{display:none}
-        .ambient-glow{position:fixed;pointer-events:none;z-index:-1;width:800px;height:800px;border-radius:50%;filter:blur(160px);opacity:.06}
+        .ambient-glow{position:fixed;pointer-events:none;z-index:-1;width:800px;height:800px;border-radius:50%;filter:blur(160px);opacity:.06;will-change:transform}
         .ambient-glow--gold{top:-200px;right:-250px;background:var(--accent-gold)}
         .ambient-glow--purple{bottom:15%;left:-300px;background:var(--accent-purple)}
         .ambient-glow--red{top:35%;right:-300px;background:var(--swiss-red);opacity:.035}
@@ -123,7 +124,7 @@
         .hero h1{font-size:46px;line-height:1.15;margin-bottom:24px}
         .hero h1 .gold-line{display:inline-block;position:relative}
         .hero h1 .gold-line::after{content:'';position:absolute;bottom:2px;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--accent-gold),transparent);opacity:.5}
-        .hero-highlight{color:var(--text-grey);font-weight:300;font-size:18px;border-left:3px solid var(--swiss-red);padding-left:20px}
+        .hero-highlight{color:var(--text-grey);font-weight:400;font-size:18px;border-left:3px solid var(--swiss-red);padding-left:20px}
 
         /* NETWORK VIZ */
         .network-viz{width:280px;height:280px}
@@ -297,6 +298,7 @@
             .lang-switch{border-right:none;padding-right:0;border-bottom:1px solid var(--border);padding-bottom:15px}
         }
         @media(max-width:480px){.hero h1{font-size:28px}.metrics-strip{grid-template-columns:1fr}.grid-section{grid-template-columns:1fr}.logo-text{font-size:12px}}
+        @media(max-width:768px){nav{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.ambient-glow{filter:blur(80px);width:400px;height:400px}}
 
         @media(prefers-reduced-motion:reduce){
             *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}
@@ -565,15 +567,22 @@ function detectLang(){const params=new URLSearchParams(window.location.search);c
 
 // Keys that contain HTML markup and require innerHTML
 const HTML_I18N_KEYS=new Set(['hero_title','step_2']);
+// Cache i18n DOM elements to avoid repeated querySelector calls
+let i18nCache=null;
+function buildI18nCache(){
+    i18nCache=new Map();
+    document.querySelectorAll('[data-i18n]').forEach(el=>{i18nCache.set(el.getAttribute('data-i18n'),el)});
+}
 function setLanguage(lang){
     document.querySelectorAll('.lang-opt').forEach(e=>e.classList.remove('active'));
     const o=document.querySelector('.lang-opt[onclick="setLanguage(\''+lang+'\')"]');
     if(o)o.classList.add('active');
     document.documentElement.lang=lang;
     if(lang==='ja')loadJapaneseFont();
+    if(!i18nCache)buildI18nCache();
     const strings=translations[lang];
     for(const key in strings){
-        const el=document.querySelector('[data-i18n="'+key+'"]');
+        const el=i18nCache.get(key);
         if(el){if(HTML_I18N_KEYS.has(key))el.innerHTML=strings[key];else el.textContent=strings[key]}
     }
     safeSet('pool_lang',lang);
@@ -602,7 +611,7 @@ function closeM(m){m.classList.remove('open');document.body.style.overflow='';if
 
 const delegateModalEl=document.getElementById('delegateModal'),qrModalEl=document.getElementById('qrModal');
 function openDelegateModal(){openM(delegateModalEl)}function closeDelegateModal(){closeM(delegateModalEl)}
-function openQRModal(){openM(qrModalEl);generateQR()}function closeQRModal(){closeM(qrModalEl)}
+function openQRModal(){openM(qrModalEl);loadQRScript();generateQR()}function closeQRModal(){closeM(qrModalEl)}
 
 [delegateModalEl,qrModalEl].forEach(m=>{
     m.addEventListener('click',e=>{if(e.target===m)closeM(m)});
@@ -612,16 +621,24 @@ function openQRModal(){openM(qrModalEl);generateQR()}function closeQRModal(){clo
     });
 });
 
-let qrGenerated=false;
+let qrGenerated=false,qrScriptLoaded=false,qrRetries=0;
+const QR_MAX_RETRIES=10;
+function loadQRScript(){
+    if(qrScriptLoaded)return;qrScriptLoaded=true;
+    const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';s.defer=true;
+    s.onload=()=>{if(!qrGenerated)generateQR()};document.head.appendChild(s);
+}
 function generateQR(){
     if(qrGenerated)return;
     const el=document.getElementById('qrCode');
     if(typeof QRCode!=='undefined'){
         new QRCode(el,{text:POOL_BECH32,width:180,height:180,colorDark:'#0B1A2E',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
         qrGenerated=true;
+    } else if(qrRetries<QR_MAX_RETRIES){
+        el.textContent='Loading QR…';qrRetries++;
+        setTimeout(generateQR,500);
     } else {
-        el.textContent='Loading QR…';
-        setTimeout(()=>{if(!qrGenerated)generateQR()},500);
+        el.textContent='QR generation failed. Please try again later.';
     }
 }
 
@@ -633,17 +650,17 @@ async function fetchPoolStats(){
         ['liveStake','liveDelegators','liveBlocks','liveROA'].forEach(id=>updateStatElement(id,'—'));
         chartFallback();return;
     }
-    const cached=cacheGet('pool_stats');
-    if(cached){applyPoolStats(cached);fetchHistory();return}
-    try{
-        const response=await fetchWithTimeout(BLOCKFROST_BASE+'/pools/'+POOL_BECH32,{headers:blockfrostHeaders()});
-        if(!response.ok)throw new Error('Blockfrost API returned HTTP '+response.status);
-        const pool=await response.json();
-        if(!pool||typeof pool!=='object')throw new Error('Invalid pool data received');
-        cacheSet('pool_stats',pool);
-        applyPoolStats(pool);
-        fetchHistory();
-    }catch(e){console.warn('Pool stats fetch failed:',e.message);['liveStake','liveDelegators','liveBlocks','liveROA'].forEach(id=>updateStatElement(id,'—'));chartFallback()}
+    const cachedStats=cacheGet('pool_stats');
+    const cachedHistory=cacheGet('pool_history');
+    if(cachedStats&&cachedHistory){applyPoolStats(cachedStats);applyHistory(cachedHistory);return}
+    // Parallelize both API calls with Promise.allSettled
+    const headers={headers:blockfrostHeaders()};
+    const [statsResult,historyResult]=await Promise.allSettled([
+        cachedStats?Promise.resolve({cached:true,data:cachedStats}):fetchWithTimeout(BLOCKFROST_BASE+'/pools/'+POOL_BECH32,headers).then(async r=>{if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();if(!d||typeof d!=='object')throw new Error('Invalid data');cacheSet('pool_stats',d);return{cached:false,data:d}}),
+        cachedHistory?Promise.resolve({cached:true,data:cachedHistory}):fetchWithTimeout(BLOCKFROST_BASE+'/pools/'+POOL_BECH32+'/history?order=desc&count=30',headers).then(async r=>{if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();cacheSet('pool_history',d);return{cached:false,data:d}})
+    ]);
+    if(statsResult.status==='fulfilled'){applyPoolStats(statsResult.value.data)}else{console.warn('Pool stats fetch failed:',statsResult.reason);['liveStake','liveDelegators','liveBlocks','liveROA'].forEach(id=>updateStatElement(id,'—'))}
+    if(historyResult.status==='fulfilled'){applyHistory(historyResult.value.data)}else{console.warn('History fetch failed:',historyResult.reason);updateStatElement('liveROA','—');chartFallback()}
 }
 function applyPoolStats(pool){
     const liveStake=(pool.live_stake&&!isNaN(pool.live_stake))?parseInt(pool.live_stake)/1e6:null;
@@ -652,24 +669,14 @@ function applyPoolStats(pool){
     updateStatElement('liveBlocks',pool.blocks_minted!=null?Number(pool.blocks_minted).toLocaleString():'—');
 }
 
-async function fetchHistory(){
-    try{
-        const cached=cacheGet('pool_history');
-        let d;
-        if(cached){d=cached}else{
-            const r=await fetchWithTimeout(BLOCKFROST_BASE+'/pools/'+POOL_BECH32+'/history?order=desc&count=30',{headers:blockfrostHeaders()});
-            if(!r.ok)throw new Error('HTTP '+r.status);
-            d=await r.json();
-            cacheSet('pool_history',d);
-        }
-        if(d&&d.length>0){
-            const wr=d.filter(e=>parseFloat(e.rewards||0)>0);
-            if(wr.length>0){let tr=0;wr.forEach(e=>{const rw=parseFloat(e.rewards)/1e6,sk=parseFloat(e.active_stake)/1e6;if(sk>0)tr+=(rw/sk)*73*100});
-            const avg=tr/wr.length;updateStatElement('liveROA',avg.toFixed(2)+'%');document.getElementById('perfAvgROA').textContent=avg.toFixed(2)+'%'}
-            document.getElementById('perfEpochs').textContent=d.length+'+';
-            buildChart(d.slice(0,20).reverse());
-        }
-    }catch(e){console.warn('History fetch failed:',e);updateStatElement('liveROA','—');chartFallback()}
+function applyHistory(d){
+    if(d&&d.length>0){
+        const wr=d.filter(e=>parseFloat(e.rewards||0)>0);
+        if(wr.length>0){let tr=0;wr.forEach(e=>{const rw=parseFloat(e.rewards)/1e6,sk=parseFloat(e.active_stake)/1e6;if(sk>0)tr+=(rw/sk)*73*100});
+        const avg=tr/wr.length;updateStatElement('liveROA',avg.toFixed(2)+'%');document.getElementById('perfAvgROA').textContent=avg.toFixed(2)+'%'}
+        document.getElementById('perfEpochs').textContent=d.length+'+';
+        buildChart(d.slice(0,20).reverse());
+    }
 }
 
 function updateStatElement(id,value){const el=document.getElementById(id);if(el){el.textContent=value;el.classList.remove('loading')}}
@@ -697,13 +704,20 @@ function initReveal(){
     const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -30px 0px'});
     document.querySelectorAll('.reveal').forEach(e=>obs.observe(e));
 }
+// Pause hero SVG animations when off-screen to save GPU
+function initAnimPause(){
+    const hero=document.querySelector('.hero-visual');
+    if(!hero)return;
+    const obs=new IntersectionObserver(es=>{es.forEach(e=>{const svg=hero.querySelector('svg');if(svg)svg.style.animationPlayState=e.isIntersecting?'running':'paused';hero.querySelectorAll('[class*="node-pulse"],[class*="edge-flow"],[class*="center-ring"]').forEach(el=>{el.style.animationPlayState=e.isIntersecting?'running':'paused'})})},{threshold:0});
+    obs.observe(hero);
+}
 
 document.querySelectorAll('.lang-opt').forEach(e=>{e.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();e.click()}})});
 document.querySelector('.help-link')?.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openDelegateModal()}});
 
 window.addEventListener('DOMContentLoaded',()=>{
     const lang=safeGet('pool_lang')||detectLang();
-    setLanguage(lang);initReveal();fetchPoolStats();
+    setLanguage(lang);initReveal();initAnimPause();fetchPoolStats();
     const yearEl=document.getElementById('copyrightYear');if(yearEl)yearEl.textContent=new Date().getFullYear();
 });
 </script>
