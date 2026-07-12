@@ -71,14 +71,15 @@
             --bg-dark: #0B1A2E;--bg-card: #162B45;--accent-gold: #C9A84C;
             --accent-purple: #9D50BB;--swiss-red: #D80000;--text-white: #FFFFFF;
             --text-grey: #B0B8C6;--border: #2A3C55;--success: #27AE60;
+            --accent-ice: #65B7D3;
         }
         *{margin:0;padding:0;box-sizing:border-box}
         html{scroll-behavior:smooth}
         body{font-family:'Inter','Noto Sans JP',sans-serif;background:var(--bg-dark);color:var(--text-white);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
         .skip-link{position:absolute;top:-100%;left:50%;transform:translateX(-50%);background:var(--accent-gold);color:var(--bg-dark);padding:8px 16px;font-weight:600;font-size:13px;z-index:9999;border-radius:0 0 4px 4px;transition:top .2s}
         .skip-link:focus{top:0}
-        .bg-mesh{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:-1;mask-image:radial-gradient(ellipse 120% 120% at 50% 40%,black 20%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse 120% 120% at 50% 40%,black 20%,transparent 70%)}
-        .bg-mesh::after{display:none}
+        .bg-mesh{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(101,183,211,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(101,183,211,.018) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:-1;mask-image:radial-gradient(ellipse 120% 120% at 50% 40%,black 20%,transparent 72%);-webkit-mask-image:radial-gradient(ellipse 120% 120% at 50% 40%,black 20%,transparent 72%)}
+        .bg-mesh::after{content:'';position:absolute;inset:0;background:repeating-radial-gradient(ellipse at 82% 16%,transparent 0 43px,rgba(101,183,211,.028) 44px 45px);opacity:.75;mask-image:radial-gradient(ellipse 45% 55% at 82% 16%,black,transparent 80%);-webkit-mask-image:radial-gradient(ellipse 45% 55% at 82% 16%,black,transparent 80%)}
         .ambient-glow{position:fixed;pointer-events:none;z-index:-1;width:800px;height:800px;border-radius:50%;filter:blur(160px);opacity:.06;will-change:transform}
         .ambient-glow--purple{bottom:15%;left:-300px;background:var(--accent-purple)}
         .ambient-glow--red{top:35%;right:-300px;background:var(--swiss-red);opacity:.035}
@@ -118,8 +119,9 @@
         .reveal-delay-1{transition-delay:.12s}.reveal-delay-2{transition-delay:.24s}.reveal-delay-3{transition-delay:.36s}
 
         /* HERO */
-        .hero{padding:70px 0 50px;display:flex;align-items:center;gap:60px;position:relative}
-        .hero-text{flex:1;min-width:0}.hero-visual{flex:0 0 320px;display:flex;justify-content:center;align-items:center}
+        .hero{padding:64px 0 50px;min-height:520px;display:flex;align-items:center;gap:36px;position:relative}
+        .hero::after{content:'';position:absolute;width:520px;height:520px;right:-80px;top:-35px;border-radius:50%;background:radial-gradient(circle,rgba(101,183,211,.055),rgba(201,168,76,.018) 38%,transparent 68%);pointer-events:none;z-index:-1}
+        .hero-text{flex:1;min-width:0}.hero-visual{flex:0 0 440px;display:flex;justify-content:center;align-items:center}
         .ticker-badge{display:inline-block;background:rgba(201,168,76,.1);color:var(--accent-gold);padding:5px 10px;font-size:11px;font-weight:600;letter-spacing:2px;margin-bottom:20px;border:1px solid rgba(201,168,76,.25)}
         .hero h1{font-size:46px;line-height:1.15;margin-bottom:24px}
         .hero h1 .gold-line{display:inline-block;position:relative}
@@ -135,19 +137,29 @@
         .hero-assurance{display:flex;align-items:center;gap:8px;margin-top:14px;color:var(--text-grey);font-size:12px}
         .hero-assurance svg{width:14px;height:14px;color:var(--success);flex-shrink:0}
 
-        /* NETWORK VIZ */
-        .network-viz{width:280px;height:280px}
-        .network-viz svg{width:100%;height:100%}
-        .node-pulse{animation:nodePulse 3s ease-in-out infinite}
-        .node-pulse:nth-child(2){animation-delay:.5s}.node-pulse:nth-child(3){animation-delay:1s}.node-pulse:nth-child(4){animation-delay:1.5s}.node-pulse:nth-child(5){animation-delay:2s}
-        @keyframes nodePulse{0%,100%{opacity:.4;r:3}50%{opacity:1;r:5}}
-        .edge-flow{stroke-dasharray:8 4;animation:edgeFlow 2.5s linear infinite}
-        @keyframes edgeFlow{to{stroke-dashoffset:-24}}
-        .center-ring{animation:ringPulse 4s ease-in-out infinite}
-        @keyframes ringPulse{0%,100%{opacity:.15;r:38}50%{opacity:.3;r:42}}
+        /* SWISS INFRASTRUCTURE BEACON */
+        .infrastructure-viz{width:440px;max-width:100%;aspect-ratio:1.1;position:relative;filter:drop-shadow(0 24px 45px rgba(0,0,0,.32))}
+        .infrastructure-viz svg{width:100%;height:100%;display:block;overflow:visible}
+        .topology-panel{fill:url(#panelGradient);stroke:rgba(101,183,211,.26);stroke-width:1}
+        .topology-grid{opacity:.55}
+        .edge-flow{stroke-dasharray:7 8;animation:edgeFlow 7s linear infinite}
+        .edge-flow--reverse{animation-direction:reverse;animation-duration:9s}
+        @keyframes edgeFlow{to{stroke-dashoffset:-60}}
+        .node-pulse{animation:nodePulse 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+        .node-pulse--delay{animation-delay:1.1s}
+        @keyframes nodePulse{0%,100%{opacity:.55;transform:scale(.84)}50%{opacity:1;transform:scale(1.18)}}
+        .center-ring{animation:ringPulse 4.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+        @keyframes ringPulse{0%,100%{opacity:.25;transform:scale(.94)}50%{opacity:.7;transform:scale(1.04)}}
+        .beacon-core{animation:beaconGlow 3s ease-in-out infinite}
+        @keyframes beaconGlow{0%,100%{filter:drop-shadow(0 0 3px rgba(201,168,76,.25))}50%{filter:drop-shadow(0 0 11px rgba(201,168,76,.7))}}
+        .topology-label{font-family:'Inter',sans-serif;font-size:7px;font-weight:600;letter-spacing:1.2px;fill:#B0B8C6}
+        .topology-label--gold{fill:#C9A84C}.topology-label--ice{fill:#65B7D3}.topology-label--green{fill:#4BD37B}
+        .topology-value{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;fill:#FFFFFF}
+        .system-corner{fill:none;stroke:#65B7D3;stroke-width:1;opacity:.45}
 
         /* LIVE STATS */
-        .live-stats-banner{background:linear-gradient(135deg,rgba(22,43,69,.8),rgba(22,43,69,.4));border:1px solid var(--border);border-radius:2px;padding:20px 30px;margin-bottom:50px;display:flex;align-items:center;gap:12px}
+        .live-stats-banner{background:linear-gradient(115deg,rgba(22,43,69,.92),rgba(10,29,47,.55));border:1px solid var(--border);border-left:2px solid rgba(101,183,211,.55);border-radius:2px;padding:20px 30px;margin-bottom:50px;display:flex;align-items:center;gap:12px;box-shadow:0 14px 40px rgba(0,0,0,.13),inset 0 1px 0 rgba(255,255,255,.025);position:relative;overflow:hidden}
+        .live-stats-banner::after{content:'';position:absolute;right:-70px;top:-90px;width:260px;height:180px;background:radial-gradient(circle,rgba(101,183,211,.07),transparent 68%);pointer-events:none}
         .live-indicator{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--success);white-space:nowrap}
         .live-indicator .dot{width:8px;height:8px;background:var(--success);border-radius:50%;animation:pulse-live 2s ease-in-out infinite}
         @keyframes pulse-live{0%,100%{box-shadow:0 0 0 0 rgba(39,174,96,.5)}50%{box-shadow:0 0 0 6px rgba(39,174,96,0)}}
@@ -160,7 +172,9 @@
 
         /* MIDNIGHT */
         .midnight-feature{background:linear-gradient(135deg,#122136,#17111F);border:1px solid rgba(157,80,187,.2);border-left:4px solid var(--accent-purple);padding:35px 40px;margin-bottom:60px;border-radius:2px;box-shadow:0 4px 30px rgba(0,0,0,.25),inset 0 1px 0 rgba(157,80,187,.08);position:relative;overflow:hidden}
-        .midnight-feature::after{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:radial-gradient(circle,rgba(157,80,187,.06),transparent 70%);pointer-events:none}
+        .midnight-feature::before{content:'MIDNIGHT';position:absolute;right:26px;top:-24px;font-family:'Inter',sans-serif;font-size:94px;font-weight:700;letter-spacing:10px;color:rgba(157,80,187,.025);pointer-events:none}
+        .midnight-feature::after{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:radial-gradient(circle,rgba(157,80,187,.08),transparent 70%);pointer-events:none}
+        .midnight-content{position:relative;z-index:1}
         .midnight-badge{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent-purple);margin-bottom:12px;display:flex;align-items:center;gap:8px}
         .midnight-badge::before{content:'';width:6px;height:6px;background:var(--accent-purple);border-radius:50%;animation:pulse-dot 2s ease infinite;flex-shrink:0}
         @keyframes pulse-dot{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(157,80,187,.4)}50%{opacity:.8;box-shadow:0 0 0 6px rgba(157,80,187,0)}}
@@ -176,6 +190,8 @@
 
         /* METRICS */
         .metrics-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:60px;padding:30px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+        .metric-item{position:relative;padding-left:17px}
+        .metric-item::before{content:'';position:absolute;left:0;top:5px;width:2px;height:38px;background:linear-gradient(var(--accent-ice),rgba(101,183,211,.08));border-radius:2px}
         .metric-item h4{font-family:'Inter','Noto Sans JP',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--text-grey);margin-bottom:6px;font-weight:500}
         .metric-item p{font-size:24px;font-weight:400}
         .metric-item .sub-text{font-size:12px;color:var(--accent-gold)}
@@ -216,6 +232,8 @@
         .grid-section{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;margin-bottom:60px}
         .card{padding:35px;border:1px solid var(--border);background:var(--bg-card);transition:transform .3s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .3s;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
         .card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--accent-gold),transparent);opacity:0;transition:opacity .3s}
+        .card::after{content:attr(data-index);position:absolute;right:18px;top:-18px;font-family:'Playfair Display',serif;font-size:94px;font-weight:600;line-height:1;color:rgba(255,255,255,.026);pointer-events:none}
+        .card>div{position:relative;z-index:1}
         .card:hover{transform:translateY(-4px);border-color:rgba(201,168,76,.3);box-shadow:0 8px 30px rgba(0,0,0,.3)}
         .card:hover::before{opacity:1}
         .card-icon{width:40px;height:40px;margin-bottom:18px;color:var(--accent-gold);opacity:.8}
@@ -290,7 +308,7 @@
         a:focus:not(:focus-visible),button:focus:not(:focus-visible){outline:none}
 
         @media(max-width:900px){
-            .hero{flex-direction:column;gap:30px}.hero-visual{flex:none}
+            .hero{flex-direction:column;gap:30px;min-height:auto}.hero-text{width:100%}.hero-visual{flex:none;width:100%}
             .live-stats-banner{flex-direction:column;align-items:flex-start}.live-stats-grid{margin-left:0}
             .operator-card{grid-template-columns:1fr}.operator-visual{flex-direction:row}
             .perf-header{flex-direction:column;align-items:flex-start}.perf-summary{justify-content:flex-start}.perf-summary-item{text-align:left}
@@ -300,7 +318,7 @@
             .pool-id-box{flex-direction:column;align-items:flex-start}.pool-id-actions{width:100%}.copy-btn,.qr-btn{flex:1;justify-content:center}
             .spec-row{flex-direction:column}.spec-label{width:100%;border-right:none;border-bottom:1px solid var(--border);padding:15px}.spec-value{width:100%;padding:15px}
             .footer-content,.footer-links{flex-direction:column;text-align:center;align-items:center}.footer-link{justify-content:center}
-            .midnight-feature{padding:25px 20px}.hero-highlight{font-size:16px}.network-viz{width:220px;height:220px}
+            .midnight-feature{padding:25px 20px}.hero-highlight{font-size:16px}.infrastructure-viz{width:400px}
             .chart-bar-label{display:none}
             .nav-toggle{display:block}
             .nav-right{position:fixed;top:61px;left:0;right:0;background:rgba(11,26,46,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);flex-direction:column;align-items:center;gap:20px;padding:30px 24px;border-bottom:1px solid var(--border);transform:translateY(-120%);opacity:0;transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .25s ease;pointer-events:none}
@@ -308,7 +326,7 @@
             .lang-switch{border-right:none;padding-right:0;border-bottom:1px solid var(--border);padding-bottom:15px}
             .nav-explorer,.btn-delegate{width:min(100%,320px);text-align:center;justify-content:center}
         }
-        @media(max-width:480px){.hero h1{font-size:28px}.metrics-strip{grid-template-columns:1fr}.grid-section{grid-template-columns:1fr}.logo-text{font-size:12px}.hero-actions{align-items:stretch;flex-direction:column}.hero-cta{width:100%}}
+        @media(max-width:480px){.hero h1{font-size:28px}.metrics-strip{grid-template-columns:1fr}.grid-section{grid-template-columns:1fr}.logo-text{font-size:12px}.hero-actions{align-items:stretch;flex-direction:column}.hero-cta{width:100%}.infrastructure-viz{width:340px}.midnight-feature::before{font-size:54px}}
         @media(max-width:768px){nav{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.ambient-glow{filter:blur(80px);width:400px;height:400px}}
 
         @media(prefers-reduced-motion:reduce){
@@ -319,7 +337,7 @@
 
         @media print{
             body{background:#fff;color:#000}
-            .bg-mesh,.ambient-glow,.network-viz,nav,.hero-visual,.chart-container,.chart-legend{display:none}
+            .bg-mesh,.ambient-glow,.infrastructure-viz,nav,.hero-visual,.chart-container,.chart-legend{display:none}
             *{color:#000 !important;border-color:#ccc !important;box-shadow:none !important;text-shadow:none !important}
             .card,.midnight-feature,.operator-card,.pool-id-section,.specs-container,.live-stats-banner{background:#fff !important;border:1px solid #ccc !important}
             .section-label,.midnight-badge,.accent-gold{color:#333 !important}
@@ -382,31 +400,94 @@
                 </div>
             </div>
             <div class="hero-visual reveal reveal-delay-3" aria-hidden="true">
-                <div class="network-viz">
-                    <svg viewBox="0 0 280 280" fill="none">
-                        <circle class="center-ring" cx="140" cy="140" r="40" stroke="#C9A84C" stroke-width=".5" fill="none" opacity=".2"/>
-                        <circle cx="140" cy="140" r="80" stroke="#2A3C55" stroke-width=".5" fill="none" opacity=".4"/>
-                        <circle cx="140" cy="140" r="120" stroke="#2A3C55" stroke-width=".3" fill="none" opacity=".2"/>
-                        <line class="edge-flow" x1="140" y1="140" x2="60" y2="60" stroke="#C9A84C" stroke-width=".8" opacity=".3"/>
-                        <line class="edge-flow" x1="140" y1="140" x2="220" y2="70" stroke="#C9A84C" stroke-width=".8" opacity=".3"/>
-                        <line class="edge-flow" x1="140" y1="140" x2="230" y2="200" stroke="#9D50BB" stroke-width=".8" opacity=".25"/>
-                        <line class="edge-flow" x1="140" y1="140" x2="50" y2="210" stroke="#9D50BB" stroke-width=".8" opacity=".25"/>
-                        <line class="edge-flow" x1="140" y1="140" x2="140" y2="30" stroke="#C9A84C" stroke-width=".8" opacity=".2"/>
-                        <line class="edge-flow" x1="140" y1="140" x2="140" y2="250" stroke="#C9A84C" stroke-width=".8" opacity=".2"/>
-                        <line class="edge-flow" x1="60" y1="60" x2="140" y2="30" stroke="#2A3C55" stroke-width=".5" opacity=".3"/>
-                        <line class="edge-flow" x1="220" y1="70" x2="140" y2="30" stroke="#2A3C55" stroke-width=".5" opacity=".3"/>
-                        <line class="edge-flow" x1="230" y1="200" x2="140" y2="250" stroke="#2A3C55" stroke-width=".5" opacity=".3"/>
-                        <line class="edge-flow" x1="50" y1="210" x2="140" y2="250" stroke="#2A3C55" stroke-width=".5" opacity=".3"/>
-                        <circle class="node-pulse" cx="60" cy="60" r="4" fill="#C9A84C"/>
-                        <circle class="node-pulse" cx="220" cy="70" r="4" fill="#C9A84C"/>
-                        <circle class="node-pulse" cx="230" cy="200" r="3.5" fill="#9D50BB"/>
-                        <circle class="node-pulse" cx="50" cy="210" r="3.5" fill="#9D50BB"/>
-                        <circle class="node-pulse" cx="140" cy="30" r="3" fill="#C9A84C"/>
-                        <circle class="node-pulse" cx="140" cy="250" r="3" fill="#C9A84C"/>
-                        <circle cx="140" cy="140" r="18" fill="#0B1A2E" stroke="#C9A84C" stroke-width="1.5"/>
-                        <circle cx="140" cy="140" r="12" fill="none" stroke="#C9A84C" stroke-width=".5" opacity=".5"/>
-                        <rect x="137" y="132" width="6" height="16" rx="1" fill="#D80000"/>
-                        <rect x="132" y="137" width="16" height="6" rx="1" fill="#D80000"/>
+                <div class="infrastructure-viz">
+                    <svg viewBox="0 0 440 400" fill="none">
+                        <defs>
+                            <linearGradient id="panelGradient" x1="24" y1="18" x2="408" y2="386" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#152D49" stop-opacity=".9"/>
+                                <stop offset=".5" stop-color="#0C2035" stop-opacity=".82"/>
+                                <stop offset="1" stop-color="#071522" stop-opacity=".94"/>
+                            </linearGradient>
+                            <linearGradient id="planeGradient" x1="128" y1="128" x2="312" y2="242" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#65B7D3" stop-opacity=".14"/>
+                                <stop offset=".55" stop-color="#C9A84C" stop-opacity=".07"/>
+                                <stop offset="1" stop-color="#9D50BB" stop-opacity=".1"/>
+                            </linearGradient>
+                            <radialGradient id="coreGradient" cx="0" cy="0" r="1" gradientTransform="translate(220 185) rotate(90) scale(58)">
+                                <stop stop-color="#193654"/>
+                                <stop offset="1" stop-color="#09192A"/>
+                            </radialGradient>
+                            <pattern id="topologyGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+                                <path d="M24 0H0V24" stroke="#65B7D3" stroke-opacity=".055" stroke-width="1"/>
+                                <circle cx="0" cy="0" r="1" fill="#65B7D3" fill-opacity=".12"/>
+                            </pattern>
+                        </defs>
+
+                        <rect class="topology-panel" x="12.5" y="12.5" width="415" height="375" rx="10"/>
+                        <rect class="topology-grid" x="24" y="24" width="392" height="352" rx="6" fill="url(#topologyGrid)"/>
+                        <path class="system-corner" d="M28 58V30H56M384 30H412V58M28 342V370H56M384 370H412V342"/>
+
+                        <circle cx="39" cy="44" r="3" fill="#4BD37B"/>
+                        <circle cx="39" cy="44" r="7" stroke="#4BD37B" stroke-opacity=".2"/>
+                        <text class="topology-label topology-label--ice" x="53" y="47">CH–ZRH / NODE 000</text>
+                        <text class="topology-label topology-label--green" x="322" y="47">MAINNET ONLINE</text>
+                        <path d="M28 64H412" stroke="#65B7D3" stroke-opacity=".12"/>
+
+                        <path class="edge-flow" d="M220 181L88 110" stroke="#65B7D3" stroke-opacity=".55"/>
+                        <path class="edge-flow edge-flow--reverse" d="M220 181L352 110" stroke="#C9A84C" stroke-opacity=".55"/>
+                        <path class="edge-flow edge-flow--reverse" d="M220 181L92 278" stroke="#C9A84C" stroke-opacity=".38"/>
+                        <path class="edge-flow" d="M220 181L348 278" stroke="#9D50BB" stroke-opacity=".58"/>
+                        <path d="M88 110L352 110M92 278L348 278" stroke="#65B7D3" stroke-opacity=".08"/>
+
+                        <g transform="translate(67 89)">
+                            <rect width="70" height="39" rx="4" fill="#0A1B2D" stroke="#65B7D3" stroke-opacity=".28"/>
+                            <circle class="node-pulse" cx="13" cy="13" r="4" fill="#65B7D3"/>
+                            <text class="topology-label" x="24" y="16">RELAY 01</text>
+                            <text class="topology-value" x="12" y="31">ACTIVE</text>
+                        </g>
+                        <g transform="translate(303 89)">
+                            <rect width="70" height="39" rx="4" fill="#0A1B2D" stroke="#C9A84C" stroke-opacity=".3"/>
+                            <circle class="node-pulse node-pulse--delay" cx="13" cy="13" r="4" fill="#C9A84C"/>
+                            <text class="topology-label" x="24" y="16">RELAY 02</text>
+                            <text class="topology-value" x="12" y="31">ACTIVE</text>
+                        </g>
+                        <g transform="translate(67 257)">
+                            <rect width="70" height="39" rx="4" fill="#0A1B2D" stroke="#C9A84C" stroke-opacity=".25"/>
+                            <circle class="node-pulse node-pulse--delay" cx="13" cy="13" r="4" fill="#C9A84C"/>
+                            <text class="topology-label" x="24" y="16">PRODUCER</text>
+                            <text class="topology-value" x="12" y="31">ACTIVE</text>
+                        </g>
+                        <g transform="translate(303 257)">
+                            <rect width="70" height="39" rx="4" fill="#0A1B2D" stroke="#9D50BB" stroke-opacity=".32"/>
+                            <circle class="node-pulse" cx="13" cy="13" r="4" fill="#9D50BB"/>
+                            <text class="topology-label" x="24" y="16">PARTNER</text>
+                            <text class="topology-value" x="12" y="31">MIDNIGHT</text>
+                        </g>
+
+                        <path d="M220 112L312 164L220 216L128 164L220 112Z" fill="url(#planeGradient)" stroke="#65B7D3" stroke-opacity=".36"/>
+                        <path d="M128 180L220 232L312 180" stroke="#65B7D3" stroke-opacity=".18"/>
+                        <path d="M143 204L220 248L297 204" stroke="#C9A84C" stroke-opacity=".17"/>
+                        <path d="M220 112V248M128 164L312 164" stroke="#65B7D3" stroke-opacity=".1"/>
+                        <circle class="center-ring" cx="220" cy="181" r="55" stroke="#65B7D3" stroke-opacity=".34"/>
+                        <circle cx="220" cy="181" r="43" fill="url(#coreGradient)" stroke="#C9A84C" stroke-opacity=".45"/>
+                        <g class="beacon-core">
+                            <path d="M220 145L249 162V196L220 213L191 196V162L220 145Z" fill="#091827" stroke="#C9A84C" stroke-width="1.5"/>
+                            <rect x="213" y="161" width="14" height="36" rx="2" fill="#D80000"/>
+                            <rect x="202" y="172" width="36" height="14" rx="2" fill="#D80000"/>
+                            <rect x="216" y="165" width="8" height="28" fill="#fff"/>
+                            <rect x="206" y="175" width="28" height="8" fill="#fff"/>
+                        </g>
+                        <text class="topology-label topology-label--gold" x="204" y="229">[000]</text>
+
+                        <path d="M28 322H412" stroke="#65B7D3" stroke-opacity=".12"/>
+                        <text class="topology-label" x="44" y="344">VARIABLE FEE</text>
+                        <text class="topology-value" x="44" y="362">0%</text>
+                        <path d="M151 334V365" stroke="#65B7D3" stroke-opacity=".14"/>
+                        <text class="topology-label" x="174" y="344">ENERGY</text>
+                        <text class="topology-value" x="174" y="362">100% ECO</text>
+                        <path d="M281 334V365" stroke="#65B7D3" stroke-opacity=".14"/>
+                        <text class="topology-label" x="304" y="344">OPERATING</text>
+                        <text class="topology-value" x="304" y="362">SINCE 2020</text>
                     </svg>
                 </div>
             </div>
@@ -466,17 +547,17 @@
         </section>
 
         <section class="grid-section" aria-label="Features">
-            <article class="card reveal"><div>
+            <article class="card reveal" data-index="01"><div>
                 <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 <h3 data-i18n="card1_title">Legacy &amp; Trust</h3><p data-i18n="card1_text">We are the 4th Cardano Stake Pool ever created on Mainnet. Our expert IT team has been operating flawlessly since the Incentivized Testnet (Beta).</p>
             </div><div class="card-footer card-footer--gold">Est. 2020</div></article>
 
-            <article class="card reveal reveal-delay-1"><div>
+            <article class="card reveal reveal-delay-1" data-index="02"><div>
                 <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <h3 data-i18n="card2_title">Swiss Jurisdiction</h3><p data-i18n="card2_text">Hosted on private bare-metal servers in Switzerland. We utilize 100% ECO energy, combining Swiss privacy standards with sustainable blockchain operations.</p>
             </div><div class="card-footer card-footer--red">Zurich / Switzerland</div></article>
 
-            <article class="card reveal reveal-delay-2"><div>
+            <article class="card reveal reveal-delay-2" data-index="03"><div>
                 <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"/></svg>
                 <h3 data-i18n="card3_title">Decentralization</h3><p data-i18n="card3_text">We are a proud member of the Single Pool Alliance. We refuse to run multiple pools or leverage our stake, ensuring the Cardano network remains secure and distributed.</p>
             </div><div class="card-footer card-footer--gold" data-i18n="card3_foot">Single Pool Alliance</div></article>
